@@ -77,7 +77,11 @@ function renderPage(pageName) {
     const year = kstNow.getFullYear();
     // JavaScript getDay() returns 0 for Sunday, 1 for Monday... 6 for Saturday
     const weekday = kstNow.getDay(); // 0 (Sunday) to 6 (Saturday)
-    const week_num = Math.ceil((kstNow.getTime() - new Date(kstNow.getFullYear(), 0, 1).getTime()) / (1000 * 60 * 60 * 24 * 7));
+    // 연초부터 현재까지의 주차 계산 (단순화된 방식)
+    const firstDayOfYear = new Date(kstNow.getFullYear(), 0, 1);
+    const daysSinceYearStart = (kstNow.getTime() - firstDayOfYear.getTime()) / (1000 * 60 * 60 * 24);
+    const week_num = Math.ceil((daysSinceYearStart + firstDayOfYear.getDay() + 1) / 7); // 첫주의 시작 요일 고려
+
 
     const WEEKDAY_STR = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     const weekday_str = WEEKDAY_STR[weekday];
@@ -110,7 +114,13 @@ function renderPage(pageName) {
             contentHTML = `
                 <h2>${weekday_str}, Week ${week_num} of the year ${year}</h2>
                 <p>${isTodayWeekday ? 'Today is a Weekday!' : 'Today is not a Weekday.'}</p>
-                `;
+                <p>평일에는 주로 규칙적인 일과를 수행합니다.</p>
+                <ul>
+                    <li>오전 9시: 업무 시작</li>
+                    <li>오후 12시: 점심 시간</li>
+                    <li>오후 6시: 업무 종료</li>
+                </ul>
+            `;
             pageContentDiv.innerHTML = contentHTML;
             break;
         case 'weekend':
@@ -118,29 +128,58 @@ function renderPage(pageName) {
             contentHTML = `
                 <h2>${weekday_str}, Week ${week_num} of the year ${year}</h2>
                 <p>${isTodayWeekend ? 'Enjoy your Weekend!' : 'It\'s not the weekend yet.'}</p>
-                `;
+                <p>주말에는 휴식과 취미 활동을 즐깁니다.</p>
+                <ul>
+                    <li>늦잠 자기</li>
+                    <li>영화 감상</li>
+                    <li>친구들과의 만남</li>
+                </ul>
+            `;
             pageContentDiv.innerHTML = contentHTML;
             break;
         case 'saturday-brunch':
-            const isBrunchWeek = (week_num % 2 !== 0); // Odd week numbers for brunch
+            const isBrunchWeek = (week_num % 2 !== 0); // Odd week numbers for brunch (홀수 주차)
             const isSaturday = (weekday === 6); // Saturday
             contentHTML = `
                 <h2>${weekday_str}, Week ${week_num} of the year ${year}</h2>
                 <p>Is it Saturday? ${isSaturday ? 'Yes!' : 'No.'}</p>
-                <p>Is it a Brunch Week? ${isBrunchWeek ? 'Yes!' : 'No.'}</p>
-                <p>${isSaturday && isBrunchWeek ? 'It\'s Saturday Brunch time!' : 'No Saturday Brunch today.'}</p>
-                `;
+                <p>Is it a Brunch Week (Odd week number)? ${isBrunchWeek ? 'Yes!' : 'No.'}</p>
+                <p>${isSaturday && isBrunchWeek ? 'It\'s Saturday Brunch time! 🥞' : 'No Saturday Brunch today. 😔'}</p>
+                ${isSaturday && isBrunchWeek ? '<p>맛있는 브런치를 즐길 시간입니다!</p>' : '<p>이번 주 토요일은 브런치 주간이 아닙니다. 다음 기회를 노려보세요!</p>'}
+            `;
             pageContentDiv.innerHTML = contentHTML;
             break;
         default:
             contentHTML = `<p>Page not found.</p>`;
             pageContentDiv.innerHTML = contentHTML;
     }
+
+    // 페이지 렌더링 후 사이드바 닫기 (모바일에서 유용)
+    closeSidebar();
 }
 
-// Event Listeners for menu items
+// -------------------- 사이드바 제어 함수 --------------------
+function openSidebar() {
+    document.getElementById("mySidebar").classList.add("active");
+    document.body.classList.add("sidebar-open"); // 콘텐츠 마진 조정을 위한 클래스
+}
+
+function closeSidebar() {
+    document.getElementById("mySidebar").classList.remove("active");
+    document.body.classList.remove("sidebar-open"); // 콘텐츠 마진 조정 클래스 제거
+}
+
+// -------------------- 초기화 및 이벤트 리스너 --------------------
 document.addEventListener('DOMContentLoaded', () => {
+    // 사이드바 버튼 요소 가져오기
+    const openSidebarBtn = document.getElementById("openSidebarBtn");
+    const closeSidebarBtn = document.getElementById("closeSidebarBtn");
     const menuItems = document.querySelectorAll('.option-menu .menu-item');
+
+    // 이벤트 리스너 연결
+    openSidebarBtn.addEventListener('click', openSidebar);
+    closeSidebarBtn.addEventListener('click', closeSidebar);
+
     menuItems.forEach(item => {
         item.addEventListener('click', function(event) {
             event.preventDefault(); // Prevent default link behavior
