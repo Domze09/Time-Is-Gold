@@ -1,77 +1,338 @@
+/*
+ * style.css - Optimized for responsive design
+ *
+ * This stylesheet ensures a consistent user experience across devices:
+ * - Desktop (large screens): Sidebar is always visible and fixed on the left.
+ * - Mobile/Tablet (small screens): Sidebar is hidden by default and toggled with a hamburger button.
+ *
+ * Key changes:
+ * - Refined media queries for clear desktop vs. mobile behaviors.
+ * - Centralized layout using flexbox on the .container.
+ * - Improved visual aesthetics with updated fonts, colors, and spacing.
+ * - Enhanced accessibility with clear button states.
+ */
+
+/* Universal Box-Sizing */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+/* Base Body Styles */
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* 폰트 변경 */
     margin: 0;
     padding: 0;
-    background-color: #f0f2f6;
-    display: flex;
-    min-height: 100vh;
+    background-color: #f0f2f6; /* 밝은 회색 배경 */
+    min-height: 100vh; /* 최소 높이 뷰포트 전체 */
+    overflow-x: hidden; /* 가로 스크롤 방지 */
 }
 
+/* Main Layout Container */
 .container {
-    display: flex;
+    display: flex; /* 사이드바와 콘텐츠를 나란히 배치 */
     width: 100%;
+    min-height: 100vh; /* 컨테이너도 뷰포트 높이만큼 설정 */
 }
 
+/* -------------------- Sidebar Styles -------------------- */
 .sidebar {
-    width: 250px;
-    background-color: #ffffff;
-    padding: 20px;
-    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    width: 250px; /* 데스크톱 기본 너비 */
+    background-color: #ffffff; /* 흰색 배경 */
+    padding: 20px 0; /* 좌우 패딩 제거, 메뉴 아이템에서 개별적으로 처리 */
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1); /* 부드러운 그림자 */
     display: flex;
     flex-direction: column;
+    /* REMOVED: position: fixed; from here to allow sticky on desktop */
+    top: 0;
+    left: 0;
+    height: 100vh; /* Changed to viewport height for consistent full-height on desktop */
+    z-index: 1000; /* 항상 상단에 표시 */
+    transition: transform 0.3s ease-in-out; /* 모바일 슬라이드 효과 */
+    transform: translateX(0); /* 데스크톱에서는 항상 보임 */
+}
+
+/* Mobile Sidebar State - Hidden by default */
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%); /* 모바일에서는 기본적으로 화면 밖으로 숨김 */
+        width: 80%; /* 모바일에서 사이드바 너비 조정 */
+        max-width: 300px; /* 너무 커지지 않도록 최대 너비 설정 */
+        box-shadow: 0 0 10px rgba(0,0,0,0.2); /* 모바일에서는 더 진한 그림자 */
+        position: fixed; /* Keep fixed for mobile overlay */
+        height: 100vh; /* Ensure full height on mobile */
+    }
+    .sidebar.active {
+        transform: translateX(0%); /* 활성화 시 보임 */
+    }
 }
 
 .menu-title {
-    font-size: 1.5em;
-    font-weight: bold;
-    margin-bottom: 20px;
+    font-size: 1.8em; /* 타이틀 크기 */
+    font-weight: 700; /* 더 굵게 */
+    margin-bottom: 30px; /* 간격 넓게 */
     color: #333;
+    text-align: center;
+    padding: 15px 0; /* 상하 패딩 추가 */
+    border-bottom: 1px solid #f0f0f0; /* 구분선 */
+}
+
+.option-menu {
+    flex-grow: 1; /* 메뉴가 남은 공간 차지 */
+    padding: 0 15px; /* 좌우 패딩 */
 }
 
 .option-menu .menu-item {
-    display: block;
-    padding: 10px 15px;
-    margin-bottom: 5px;
+    display: flex; /* 아이콘과 텍스트 정렬 */
+    align-items: center;
+    padding: 15px 20px; /* 패딩 증가 */
+    margin-bottom: 10px; /* 마진 증가 */
     text-decoration: none;
-    color: #555;
-    border-radius: 5px;
-    transition: background-color 0.2s, color 0.2s;
+    color: #555; /* 부드러운 회색 */
+    border-radius: 8px; /* 둥근 모서리 */
+    transition: background-color 0.2s, color 0.2s, transform 0.1s;
+    font-size: 1.15em; /* 폰트 크기 증가 */
+    font-weight: 500; /* 약간 굵게 */
+}
+
+.option-menu .menu-item i {
+    margin-right: 12px; /* 아이콘과 텍스트 간격 */
+    font-size: 1.3em; /* 아이콘 크기 */
 }
 
 .option-menu .menu-item:hover,
 .option-menu .menu-item.active {
-    background-color: #e0f7fa;
-    color: #007bff;
+    background-color: #e3f2fd; /* 은은한 파란색 배경 */
+    color: #007bff; /* 활성 색상 */
+    transform: translateX(5px); /* 호버/활성화 시 약간 이동 */
 }
 
+/* -------------------- Main Content Area Styles -------------------- */
 .content {
-    flex-grow: 1;
+    flex-grow: 1; /* 남은 공간 모두 차지 */
     padding: 20px;
-    background-color: #ffffff;
-    margin-left: 20px;
+    background-color: #f0f2f6; /* 바디 배경색과 동일하게 설정 */
+    transition: margin-left 0.3s ease-in-out; /* 사이드바 열림/닫힘에 맞춰 콘텐츠 이동 */
+    margin-left: 250px; /* 데스크톱에서 사이드바 너비만큼 왼쪽 마진 */
+}
+
+/* Mobile Content Adjustment */
+@media (max-width: 768px) {
+    .content {
+        margin-left: 0; /* 모바일에서는 사이드바가 덮으므로 마진 0 */
+        padding: 15px; /* 패딩 줄임 */
+        width: 100%; /* 너비 꽉 채움 */
+    }
+}
+
+/* -------------------- Page Content Styles -------------------- */
+#page-content {
+    background-color: #ffffff; /* 페이지 콘텐츠 영역 흰색 배경 */
     border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05); /* 부드러운 그림자 */
+    padding: 30px; /* 내부 패딩 */
 }
 
-h1 {
+h2 { /* 페이지별 타이틀 (예: Home, Weekday) */
     color: #333;
+    font-size: 2em;
     border-bottom: 1px solid #eee;
-    padding-bottom: 10px;
-    margin-bottom: 20px;
+    padding-bottom: 15px;
+    margin-bottom: 25px;
+    text-align: center;
 }
 
+h3 { /* 각 카운트다운 섹션 위의 부제목 */
+    font-size: 1.8em;
+    color: #444;
+    margin-top: 40px;
+    margin-bottom: 25px;
+    border-bottom: 1px dashed #eee; /* 점선 구분선 */
+    padding-bottom: 10px;
+    text-align: center;
+}
+
+p {
+    font-size: 1.1em;
+    line-height: 1.6;
+    color: #666;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+ul {
+    list-style: none; /* 기본 리스트 스타일 제거 */
+    padding: 0;
+    margin: 20px auto; /* 가운데 정렬 및 상하 마진 */
+    max-width: 400px; /* 리스트 너비 제한 */
+}
+
+ul li {
+    background-color: #f8f8f8; /* 리스트 아이템 배경색 */
+    margin-bottom: 8px;
+    padding: 10px 15px;
+    border-left: 4px solid #007bff; /* 포인트 색상 */
+    border-radius: 4px;
+    color: #555;
+    font-size: 1em;
+}
+
+hr {
+    border: none;
+    border-top: 1px solid #eee;
+    margin: 40px 0;
+}
+
+/* Countdown Section Styles */
 .countdown-section {
-    margin-bottom: 30px;
+    margin-bottom: 35px;
+    background-color: #fdfdfd; /* 더욱 밝은 배경색 */
+    padding: 25px;
+    border-radius: 10px; /* 더 둥근 모서리 */
+    border: 1px solid #e0e0e0; /* 미묘한 테두리 */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05); /* 약간 입체적인 그림자 */
 }
 
 .countdown-title {
-    font-size: 1.8em;
-    color: #444;
-    margin-bottom: 10px;
+    font-size: 1.7em;
+    color: #333;
+    margin-bottom: 18px;
+    text-align: center;
+    font-weight: 600; /* 조금 더 굵게 */
 }
 
 .countdown {
-    font-size: 3em; /* Equivalent to your font_size=40 */
-    font-weight: bold;
-    color: #007bff;
+    font-size: 4em; /* 카운트다운 숫자 크기 증가 */
+    font-weight: 800; /* 매우 굵게 */
+    color: #007bff; /* 메인 브랜드 색상 */
+    text-align: center;
+    letter-spacing: -1.5px; /* 글자 간격 조정 */
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1); /* 텍스트 그림자 */
+}
+
+/* -------------------- Buttons -------------------- */
+
+/* Hamburger Menu Button (Open Sidebar) */
+.open-sidebar-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    font-size: 2.2em; /* 아이콘 크기 증가 */
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 50%; /* 원형 버튼 */
+    width: 50px; /* 너비 고정 */
+    height: 50px; /* 높이 고정 */
+    display: flex; /* 아이콘 중앙 정렬 */
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    z-index: 1001; /* 사이드바보다 위 */
+    box-shadow: 0 3px 10px rgba(0,0,0,0.2); /* 그림자 강화 */
+    transition: background-color 0.2s, transform 0.2s, opacity 0.3s;
+    opacity: 1; /* 기본적으로 보임 (모바일) */
+}
+
+.open-sidebar-btn:hover {
+    background-color: #0056b3; /* 호버 시 색상 변경 */
+    transform: scale(1.05); /* 약간 확대 */
+}
+
+/* Close Sidebar Button */
+.close-sidebar-btn {
+    position: absolute; /* 사이드바 내에서 절대 위치 */
+    top: 15px;
+    right: 15px;
+    font-size: 2.8em; /* 아이콘 크기 증가 */
+    background: transparent;
+    border: none;
+    color: #888; /* 부드러운 회색 */
+    cursor: pointer;
+    transition: color 0.2s;
+    padding: 5px; /* 클릭 영역 확보 */
+}
+
+.close-sidebar-btn:hover {
+    color: #333; /* 호버 시 진한 회색 */
+}
+
+/* -------------------- Responsive Design (Media Queries) -------------------- */
+
+/* Desktop & Larger Tablets (min-width: 769px) */
+@media (min-width: 769px) {
+    .sidebar {
+        position: sticky; /* 스크롤해도 사이드바가 제자리에 고정 */
+        top: 0; /* 상단에 고정 */
+        left: 0;
+        transform: translateX(0%); /* 항상 보임 */
+        width: 250px; /* 고정 너비 */
+        box-shadow: 2px 0 5px rgba(0,0,0,0.1); /* 데스크톱 그림자 */
+        height: 100vh; /* Ensure it sticks to full viewport height */
+    }
+
+    .content {
+        margin-left: 250px; /* 사이드바 너비만큼 왼쪽 마진 */
+        padding: 30px; /* 데스크톱 패딩 */
+    }
+
+    .open-sidebar-btn,
+    .close-sidebar-btn {
+        display: none; /* 데스크톱에서는 버튼 숨김 */
+    }
+}
+
+/* Tablet & Mobile (max-width: 768px) */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column; /* 세로 정렬 (필요 없음, 이미 .content에서 margin-left:0 처리) */
+    }
+
+    /* .sidebar.active는 위에 이미 정의되어 있음 */
+
+    /* .content는 위에 이미 정의되어 있음 */
+
+    .open-sidebar-btn {
+        display: flex; /* 모바일에서만 햄버거 버튼 보이기 */
+    }
+
+    .close-sidebar-btn {
+        display: block; /* 모바일 사이드바에서 닫기 버튼 보이기 */
+    }
+
+    /* 사이드바가 열려있을 때 본문 스크롤 방지 (모바일 오버레이 효과) */
+    body.sidebar-open {
+        overflow: hidden;
+    }
+}
+
+/* Small Mobile (max-width: 480px) */
+@media (max-width: 480px) {
+    .sidebar {
+        width: 100%; /* 작은 모바일에서는 전체 너비 */
+        max-width: none; /* 최대 너비 제한 해제 */
+    }
+
+    .open-sidebar-btn {
+        top: 15px; /* 약간 위로 */
+        left: 15px;
+        font-size: 2em;
+        width: 45px;
+        height: 45px;
+    }
+
+    #page-content {
+        padding: 20px; /* 작은 화면 패딩 줄임 */
+    }
+
+    h2 {
+        font-size: 1.8em;
+    }
+
+    .countdown-title {
+        font-size: 1.5em;
+    }
+
+    .countdown {
+        font-size: 3em; /* 작은 화면 카운트다운 크기 조정 */
+    }
 }
